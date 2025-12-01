@@ -13,3 +13,8 @@ maintainers:
 home: https://temporal.io
 sources:
   - https://github.com/temporalio/temporal
+dependencies:
+  - name: postgresql
+    version: "15.5.38"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: postgresql.enabled

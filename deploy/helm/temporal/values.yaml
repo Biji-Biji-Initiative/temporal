@@ -39,12 +39,31 @@ ingress:
 
 # Database configuration (PostgreSQL)
 database:
-  host: "temporal-postgres-postgresql"
+  host: "temporal-local-postgresql"  # Will be <release-name>-postgresql
   port: 5432
   name: "temporal"
   user: "temporal"
   password: "changeme"  # Override in production with ExternalSecret
   sslmode: "disable"
+
+# PostgreSQL subchart configuration
+postgresql:
+  enabled: true
+  auth:
+    username: "temporal"
+    password: "changeme"  # Override in production
+    database: "temporal"
+  primary:
+    persistence:
+      enabled: true
+      size: 10Gi
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "100m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
 
 # Listmonk application configuration
 config:
