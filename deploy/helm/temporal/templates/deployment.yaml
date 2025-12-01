@@ -44,7 +44,7 @@ spec:
               protocol: TCP
           env:
             - name: DB
-              value: "postgresql"
+              value: "postgres12"
             - name: POSTGRES_SEEDS
               value: {{ .Values.database.host | quote }}
             - name: DB_PORT
