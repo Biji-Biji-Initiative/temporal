@@ -1,0 +1,15 @@
+apiVersion: v2
+name: temporal
+description: Temporal workflow orchestration platform
+type: application
+version: 1.0.0
+appVersion: "latest"
+keywords:
+  - temporal
+  - workflow
+  - orchestration
+maintainers:
+  - name: BBI Team
+home: https://temporal.io
+sources:
+  - https://github.com/temporalio/temporal

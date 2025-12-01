@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "temporal.fullname" . }}
+  labels:
+    {{- include "temporal.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "temporal.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "temporal.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "temporal.serviceAccountName" . }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.image.digest }}
+          image: "{{ .Values.image.repository }}@{{ .Values.image.digest }}"
+          {{- else }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          {{- end }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+              protocol: TCP
+          env:
+            - name: LISTMONK_app__address
+              value: {{ .Values.config.app.address | quote }}
+            - name: LISTMONK_db__host
+              value: {{ .Values.database.host | quote }}
+            - name: LISTMONK_db__port
+              value: {{ .Values.database.port | quote }}
+            - name: LISTMONK_db__user
+              value: {{ .Values.database.user | quote }}
+            - name: LISTMONK_db__password
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "temporal.fullname" . }}-db
+                  key: password
+            - name: LISTMONK_db__database
+              value: {{ .Values.database.name | quote }}
+            - name: LISTMONK_db__ssl_mode
+              value: {{ .Values.database.sslmode | quote }}
+            {{- if .Values.auth.enabled }}
+            - name: AUTH_SERVICE_URL
+              value: {{ .Values.auth.serviceUrl | quote }}
+            - name: AUTH_SKIP_VALIDATION
+              value: {{ .Values.auth.skipValidation | quote }}
+            {{- end }}
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.persistence.enabled }}
+          volumeMounts:
+            - name: uploads
+              mountPath: /temporal/uploads
+          {{- end }}
+      {{- if .Values.persistence.enabled }}
+      volumes:
+        - name: uploads
+          persistentVolumeClaim:
+            claimName: {{ include "temporal.fullname" . }}-uploads
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,0 +1,141 @@
+# Default values for temporal
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Image configuration
+image:
+  repository: temporal/temporal
+  tag: "v3.0.0"
+  digest: ""  # Will be set by CI for production
+  pullPolicy: IfNotPresent
+
+# Number of replicas
+replicaCount: 1
+
+# Service account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 7233
+  targetPort: 7233
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    # Auth annotations will be added per environment
+  host: ""  # Set in overlay (e.g., temporal.lvh.me)
+  domain: "" # Set in overlay (e.g., lvh.me)
+  tls:
+    enabled: true
+    secretName: ""  # Auto-generated from host
+
+# Database configuration (PostgreSQL)
+database:
+  host: "temporal-postgres-postgresql"
+  port: 5432
+  name: "temporal"
+  user: "temporal"
+  password: "changeme"  # Override in production with ExternalSecret
+  sslmode: "disable"
+
+# Listmonk application configuration
+config:
+  # Admin credentials (for first-time setup)
+  admin:
+    username: "temporal"
+    password: "temporal"  # Change in production!
+
+  # App settings
+  app:
+    address: "0.0.0.0:7233"
+    adminUsername: "temporal"
+    adminPassword: "temporal"
+
+# Resource limits
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "100m"
+  limits:
+    memory: "512Mi"
+    cpu: "500m"
+
+# Liveness and readiness probes
+livenessProbe:
+  httpGet:
+    path: /api/health
+    port: 7233
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /api/health
+    port: 7233
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+# Storage for uploads
+persistence:
+  enabled: true
+  storageClass: "standard"
+  size: "10Gi"
+  accessMode: ReadWriteOnce
+
+# Auth configuration (for oauth2-proxy integration)
+auth:
+  enabled: false
+  serviceUrl: ""
+  skipValidation: false
+
+# External Secrets configuration
+externalSecret:
+  enabled: false
+  secretStore: "gcp-secret-manager"
+  path: ""
+
+# Horizontal Pod Autoscaling
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Node selector
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity
+affinity: {}
+
+# Pod annotations
+podAnnotations: {}
+
+# Pod security context
+podSecurityContext:
+  fsGroup: 1000
+  runAsNonRoot: true
+  runAsUser: 1000
+
+# Container security context
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false

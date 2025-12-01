@@ -1,0 +1,36 @@
+{{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "temporal.fullname" . }}
+  labels:
+    {{- include "temporal.labels" . | nindent 4 }}
+  annotations:
+    {{- if .Values.auth.enabled }}
+    nginx.ingress.kubernetes.io/auth-url: "http://oauth2-proxy.auth.svc.cluster.local/oauth2/auth"
+    nginx.ingress.kubernetes.io/auth-signin: "https://auth.{{ .Values.ingress.domain }}/oauth2/start?rd=$scheme://$host$request_uri"
+    nginx.ingress.kubernetes.io/auth-response-headers: "X-User-Id,X-User-Email,X-User-Name,X-User-Groups"
+    {{- end }}
+    {{- with .Values.ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- if .Values.ingress.tls.enabled }}
+  tls:
+    - hosts:
+        - {{ .Values.ingress.host }}
+      secretName: {{ default (printf "%s-tls" (include "temporal.fullname" .)) .Values.ingress.tls.secretName }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.ingress.host }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "temporal.fullname" . }}
+                port:
+                  number: {{ .Values.service.port }}
+{{- end }}
