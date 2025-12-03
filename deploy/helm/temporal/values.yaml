@@ -118,14 +118,28 @@ auth:
   serviceUrl: ""
   skipValidation: false
 
-# Native OIDC configuration for Temporal UI
-# See: https://docs.temporal.io/self-hosted-guide/security#temporal-web-ui-oidc
-oidc:
+# Temporal Web UI configuration
+ui:
   enabled: false
-  provider: ""           # OIDC provider URL (e.g., https://auth.example.com/application/o/temporal/)
-  clientId: ""           # OIDC client ID
-  clientSecret: ""       # OIDC client secret
-  callbackUrl: ""        # Callback URL (e.g., https://temporal.example.com/auth/sso/callback)
+  image:
+    repository: temporalio/ui
+    tag: "2.31.2"
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "50m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+  # OIDC configuration for Temporal UI
+  # See: https://docs.temporal.io/references/web-ui-configuration
+  oidc:
+    enabled: false
+    providerUrl: ""      # OIDC provider URL (e.g., https://auth.example.com/application/o/temporal/)
+    clientId: ""         # OIDC client ID
+    clientSecret: ""     # OIDC client secret
+    callbackUrl: ""      # Callback URL (e.g., https://temporal.example.com/auth/sso/callback)
 
 # External Secrets configuration
 externalSecret:
