@@ -70,6 +70,21 @@ spec:
             - name: AUTH_SKIP_VALIDATION
               value: {{ .Values.auth.skipValidation | quote }}
             {{- end }}
+            {{- if .Values.oidc.enabled }}
+            - name: TEMPORAL_AUTH_ENABLED
+              value: "true"
+            - name: TEMPORAL_AUTH_PROVIDER_URL
+              value: {{ .Values.oidc.provider | quote }}
+            - name: TEMPORAL_AUTH_CLIENT_ID
+              value: {{ .Values.oidc.clientId | quote }}
+            - name: TEMPORAL_AUTH_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "temporal.fullname" . }}-oidc
+                  key: client-secret
+            - name: TEMPORAL_AUTH_CALLBACK_URL
+              value: {{ .Values.oidc.callbackUrl | quote }}
+            {{- end }}
           {{- with .Values.livenessProbe }}
           livenessProbe:
             {{- toYaml . | nindent 12 }}

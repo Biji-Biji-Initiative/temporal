@@ -118,6 +118,15 @@ auth:
   serviceUrl: ""
   skipValidation: false
 
+# Native OIDC configuration for Temporal UI
+# See: https://docs.temporal.io/self-hosted-guide/security#temporal-web-ui-oidc
+oidc:
+  enabled: false
+  provider: ""           # OIDC provider URL (e.g., https://auth.example.com/application/o/temporal/)
+  clientId: ""           # OIDC client ID
+  clientSecret: ""       # OIDC client secret
+  callbackUrl: ""        # Callback URL (e.g., https://temporal.example.com/auth/sso/callback)
+
 # External Secrets configuration
 externalSecret:
   enabled: false
