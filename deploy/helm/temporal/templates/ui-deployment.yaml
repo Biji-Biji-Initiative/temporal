@@ -25,6 +25,10 @@ spec:
       securityContext:
         runAsNonRoot: false
       serviceAccountName: {{ include "temporal.serviceAccountName" . }}
+      {{- with .Values.ui.extraInitContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: temporal-ui
           securityContext:
@@ -60,6 +64,13 @@ spec:
             - name: TEMPORAL_AUTH_SCOPES
               value: "openid,profile,email"
             {{- end }}
+            {{- with .Values.ui.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with .Values.ui.extraEnvFrom }}
+          envFrom:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           livenessProbe:
             httpGet:
               path: /
@@ -74,6 +85,17 @@ spec:
             periodSeconds: 5
           resources:
             {{- toYaml .Values.ui.resources | nindent 12 }}
+          {{- if .Values.ui.extraVolumeMounts }}
+          volumeMounts:
+            {{- toYaml .Values.ui.extraVolumeMounts | nindent 12 }}
+          {{- end }}
+      {{- with .Values.ui.extraContainers }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.ui.extraVolumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
