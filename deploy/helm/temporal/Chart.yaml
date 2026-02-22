@@ -15,6 +15,6 @@ sources:
   - https://github.com/temporalio/temporal
 dependencies:
   - name: postgresql
-    version: "15.5.38"
+    version: "18.4.0"
     repository: "https://charts.bitnami.com/bitnami"
     condition: postgresql.enabled
