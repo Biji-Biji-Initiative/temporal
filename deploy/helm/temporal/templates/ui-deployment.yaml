@@ -23,7 +23,9 @@ spec:
         app.kubernetes.io/component: ui
     spec:
       securityContext:
-        runAsNonRoot: false
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
       serviceAccountName: {{ include "temporal.serviceAccountName" . }}
       {{- with .Values.ui.extraInitContainers }}
       initContainers:
