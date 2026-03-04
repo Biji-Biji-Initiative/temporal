@@ -23,8 +23,8 @@
 ## Required Runtime Configuration
 
 - Required env vars:
-  - `TODO_ENV_VAR_1`
-  - `TODO_ENV_VAR_2`
+  - `TEMPORAL_AUTH_CLIENT_ID`
+  - `TEMPORAL_AUTH_CLIENT_SECRET`
 - Secret source:
   - Infisical path: `/k8s/temporal`
   - ESO target secret: `temporal-secrets`
@@ -50,8 +50,8 @@ If pattern uses OIDC:
 ## Verification
 
 - Local:
-  - `TODO_LOCAL_CHECK_1`
-  - `TODO_LOCAL_CHECK_2`
+  - `rg -n 'TEMPORAL_AUTH_CLIENT_ID|TEMPORAL_AUTH_CLIENT_SECRET|TEMPORAL_AUTH_PROVIDER_URL' deploy/helm/temporal/templates`
+  - `helm lint deploy/helm/temporal`
 - Platform:
   - `auth-verify contract-check --format json`
   - `auth-verify drift-detect --format json`
