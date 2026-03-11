@@ -20,6 +20,16 @@
 - Pattern: `native-oidc`
 - Domain(s): `temporal.mereka.io,temporal.mereka.dev`
 
+## Authorization Boundary
+
+- This repo documents **OIDC login/bootstrap capability**, not Temporal-side operator/admin authorization.
+- Successful Authentik SSO login MUST NOT be treated as proof that the user can administer Temporal.
+- Canonical environment-level authorization truth lives in `k8s/bbi-infrastructure`:
+  - `docs/security/TEMPORAL_AUTHORIZATION_CONTRACT.md`
+  - `docs/security/AUTHENTICATION.md`
+  - `docs/AUTH_REGISTRY.yaml`
+- Until a Temporal-side role/claim mapping contract exists, operator/admin capability remains an explicit GitOps/runtime concern rather than a chart-owned guarantee.
+
 ## Required Runtime Configuration
 
 - Required env vars:
@@ -46,6 +56,7 @@ If pattern uses OIDC:
 - Issuer URL MUST be canonical Authentik URL
 - Issuer/discovery path must be provider-specific (`/application/o/<slug>/`)
 - Client secret MUST come from secret manager (not plaintext values files)
+- This chart MUST only claim identity bootstrap. Any Temporal-side authorization semantics MUST be documented in canonical GitOps docs before they are treated as supported runtime behavior.
 
 ## Verification
 
@@ -61,5 +72,5 @@ If pattern uses OIDC:
 - Any auth pattern/domain change requires:
   - Update in canonical infra repo
   - Update in auth registry/spec if needed
+  - Update Temporal authorization boundary docs if operator/admin semantics changed
   - Evidence attached in PR
-
