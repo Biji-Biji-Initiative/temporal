@@ -154,6 +154,10 @@ externalSecret:
   keys:
     dbPassword: ""
     uiClientSecret: ""
+    # Optional: Infisical key for the PostgreSQL superuser ("postgres") password.
+    # Required when wiring postgresql.auth.existingSecret so the Bitnami subchart
+    # can deterministically initialise the superuser on fresh PVCs.
+    dbPostgresPassword: ""
 
 # Horizontal Pod Autoscaling
 autoscaling:
