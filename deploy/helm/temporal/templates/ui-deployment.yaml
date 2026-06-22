@@ -34,7 +34,11 @@ spec:
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
+          {{- if .Values.ui.image.digest }}
+          image: "{{ .Values.ui.image.repository }}@{{ .Values.ui.image.digest }}"
+          {{- else }}
           image: "{{ .Values.ui.image.repository }}:{{ .Values.ui.image.tag }}"
+          {{- end }}
           imagePullPolicy: {{ .Values.ui.image.pullPolicy }}
           ports:
             - name: http

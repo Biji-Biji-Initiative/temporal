@@ -124,6 +124,7 @@ ui:
   image:
     repository: temporalio/ui
     tag: "2.31.2"
+    digest: ""
     pullPolicy: IfNotPresent
   resources:
     requests:
